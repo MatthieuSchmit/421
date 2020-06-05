@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:quatre_cent_vingt_et_un/screen/StartPage.dart';
 
 void main() => runApp(MyApp());
 
@@ -11,7 +12,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: '421'),
+      home: StartPage(), // MyHomePage(title: '421'),
     );
   }
 }
