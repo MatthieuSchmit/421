@@ -14,9 +14,12 @@ class Player {
   bool lock1;
   bool lock2;
   bool lock3;
+
+  String ranking = '0';
+
   int token = 0;
 
-  Player({this.id, this.name, this.dice1, this.dice2, this.dice3, this.lock1, this.lock2, this.lock3});
+  Player({this.id, this.name, this.dice1, this.dice2, this.dice3, this.lock1, this.lock2, this.lock3, this.ranking, this.token});
 
   factory Player.fromJson(Map<String,dynamic> parsedJson) {
     return Player(
@@ -30,6 +33,9 @@ class Player {
       lock1: parsedJson['lock1'] ?? false,
       lock2: parsedJson['lock2'] ?? false,
       lock3: parsedJson['lock3'] ?? false,
+
+      ranking: parsedJson['ranking'] ?? '0',
+      token: parsedJson['token'] ?? 0
     );
   }
 
@@ -43,7 +49,8 @@ class Player {
       'lock1' : this.lock1,
       'lock2' : this.lock2,
       'lock3' : this.lock3,
-      //'token' : this.token
+      'ranking' : this.ranking,
+      'token' : this.token
     };
   }
 

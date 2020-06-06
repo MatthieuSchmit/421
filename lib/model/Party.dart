@@ -14,22 +14,32 @@ class Party {
   int index;
   String host;
   bool open = true;
+
+  String playIndex = '0';
+  String firstIndex = '0';
+  String lastIndex = '0';
+
+  List<String> winners = [];
+  List<String> ranking = [];
+
   int nbRound = 1;
   int token = 21;
   int rolled = 3;
 
-  Party({this.id, this.name, this.players, this.index, this.host});
+  Party({this.id, this.name, this.players, this.index, this.host, this.playIndex, this.firstIndex, this.lastIndex, this.token});
 
   factory Party.fromJson(Map<String,dynamic> parsedJson) {
     return Party(
       id: parsedJson["id"],
       name: parsedJson["name"],
       players: [], // parsedJson["players"],
-
       index: (parsedJson['index'] is int) ? parsedJson['index'] : int.parse(parsedJson['index']),
-
-      //index: parsedJson["index"],
       host: parsedJson['host'],
+      playIndex: parsedJson['playIndex'] ?? '0',
+
+      firstIndex: parsedJson['firstIndex'] ?? '0',
+      lastIndex: parsedJson['lastIndex'] ?? '0',
+      token: parsedJson['token'] ?? 21,
     );
   }
 
@@ -42,7 +52,13 @@ class Party {
       "open" : this.open,
       "players" : this.players,
       "nbRound" : this.nbRound,
+      "playIndex" : this.playIndex,
+      "firstIndex" : this.firstIndex,
+      "lastIndex" : this.lastIndex,
+      "token" : this.token,
 
+      "winners" : this.winners,
+      "ranking" : this.ranking,
     };
   }
 
