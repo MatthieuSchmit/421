@@ -15,15 +15,17 @@ class Party {
   String host;
   bool open = true;
 
-  String playIndex = '0';
-  String firstIndex = '0';
-  String lastIndex = '0';
+  int playIndex = 0;
+  int firstIndex = 0;
+  int lastIndex = 0;
 
   List<String> winners = [];
   List<String> ranking = [];
 
   int nbRound = 1;
+
   int token = 21;
+
   int rolled = 3;
 
   Party({this.id, this.name, this.players, this.index, this.host, this.playIndex, this.firstIndex, this.lastIndex, this.token});
@@ -35,10 +37,10 @@ class Party {
       players: [], // parsedJson["players"],
       index: (parsedJson['index'] is int) ? parsedJson['index'] : int.parse(parsedJson['index']),
       host: parsedJson['host'],
-      playIndex: parsedJson['playIndex'] ?? '0',
+      playIndex: parsedJson['playIndex'] ?? 0,
 
-      firstIndex: parsedJson['firstIndex'] ?? '0',
-      lastIndex: parsedJson['lastIndex'] ?? '0',
+      firstIndex: parsedJson['firstIndex'] ?? 0,
+      lastIndex: parsedJson['lastIndex'] ?? 0,
       token: parsedJson['token'] ?? 21,
     );
   }

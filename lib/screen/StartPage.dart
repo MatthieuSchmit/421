@@ -5,15 +5,16 @@
  *
  */
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:quatre_cent_vingt_et_un/helper/GameCommunication.dart';
 import 'package:quatre_cent_vingt_et_un/model/Party.dart';
 import 'package:quatre_cent_vingt_et_un/model/Player.dart';
+import 'package:quatre_cent_vingt_et_un/screen/game/Charge.dart';
 import 'package:quatre_cent_vingt_et_un/screen/rule/Rules.dart';
 
-import 'GamePage.dart';
-import 'RoundFirst.dart';
-
+import 'game/Uncharge.dart';
 
 class StartPage extends StatefulWidget {
   @override
@@ -59,13 +60,43 @@ class _StartPageState extends State<StartPage> {
 
       case 'party_play':
         _party.open = false;
-        Navigator.push(context, new MaterialPageRoute(
-          builder: (BuildContext context)
-          => RoundFirst(
-            party: _party,
-            playerID: playerID,
-          ),
-        ));
+        setState(() {});
+
+        //Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
+        //  builder: (context) => RoundFirst(party: _party, playerID: playerID),
+        //));
+
+        break;
+
+
+
+      case 'party_action':
+
+        Map<String,dynamic> data = json.decode(message['data']);
+
+        List<dynamic> players = data['players'];
+        _party.players = [];
+        players.forEach((element) {
+          Player player = new Player.fromJson(element);
+          _party.players.add(player);
+        });
+
+        _party.token = data['token'];
+        _party.lastIndex = data['lastIndex'];
+        _party.firstIndex = data['firstIndex'];
+        _party.playIndex = data['playIndex'];
+        _party.nbRound = data['nbRound'];
+
+        if (_party.token == 0) {
+          List<dynamic> winners = data['winners'];
+          _party.winners = [];
+          winners.forEach((element) {
+            _party.winners.add(element);
+          });
+        }
+
+        setState(() {});
+
         break;
 
       case 'joined':
@@ -121,6 +152,10 @@ class _StartPageState extends State<StartPage> {
   // List of players + button 'play'
   Widget _bodyGame() {
     if (_party == null) return Container();
+
+    if (!_party.open && _party.nbRound == 1) return Charge(playerID: playerID, party: _party);
+
+    if (!_party.open && _party.nbRound == 2) return Uncharge(playerID: playerID, party: _party);
 
     List<Widget> list = [];
 
@@ -236,4 +271,5 @@ class _StartPageState extends State<StartPage> {
       ),
     );
   }
+
 }
