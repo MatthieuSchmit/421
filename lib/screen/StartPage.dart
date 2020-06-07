@@ -61,11 +61,6 @@ class _StartPageState extends State<StartPage> {
       case 'party_play':
         _party.open = false;
         setState(() {});
-
-        //Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
-        //  builder: (context) => RoundFirst(party: _party, playerID: playerID),
-        //));
-
         break;
 
 
@@ -86,6 +81,10 @@ class _StartPageState extends State<StartPage> {
         _party.firstIndex = data['firstIndex'];
         _party.playIndex = data['playIndex'];
         _party.nbRound = data['nbRound'];
+
+        _party.maxRolled = data['maxRolled'];
+        _party.rolled = data['rolled'];
+        _party.firstPlayerIndex = data['firstPlayerIndex'];
 
         if (_party.token == 0) {
           List<dynamic> winners = data['winners'];

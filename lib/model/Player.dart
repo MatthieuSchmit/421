@@ -13,6 +13,8 @@ class Player {
   int dice2;
   int dice3;
 
+  bool hasPlay = false;
+
   bool lock1;
   bool lock2;
   bool lock3;
@@ -23,7 +25,10 @@ class Player {
 
   int token = 0;
 
-  Player({this.id, this.name, this.dice1, this.dice2, this.dice3, this.lock1, this.lock2, this.lock3, this.ranking, this.token, this.point});
+  Player({
+    this.id, this.name, this.dice1, this.dice2, this.dice3, this.lock1,
+    this.lock2, this.lock3, this.ranking, this.token, this.point, this.hasPlay
+  });
 
   factory Player.fromJson(Map<String,dynamic> parsedJson) {
     return Player(
@@ -41,6 +46,8 @@ class Player {
       ranking: parsedJson['ranking'] ?? '0',
       token: parsedJson['token'] ?? 0,
       point: parsedJson['point'] ?? 0,
+
+      hasPlay: parsedJson['hasPlay'] ?? false,
     );
   }
 
@@ -57,6 +64,7 @@ class Player {
       'ranking' : this.ranking,
       'token' : this.token,
       'point': this.point,
+      'hasPlay' : this.hasPlay
     };
   }
 

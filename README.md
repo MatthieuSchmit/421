@@ -2,6 +2,15 @@
 
 421 game
 
+## TODO
+- 221 (nenette)
+- 0 token discharge => Winner
+- End party
+- Eject player (before play)
+- Roll dice to get play order
+- Discharge : force nb roll
+- Discharge : 421 => all token 
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.

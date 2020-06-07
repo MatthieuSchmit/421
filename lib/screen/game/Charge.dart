@@ -45,11 +45,14 @@ class Charge extends StatelessWidget {
             Expanded(
               child: Row(
                 children: <Widget>[
-                  Text(player.name),
-                  Text('${player.token}'),
-                  (this.playerID == player.id) ? Text('YOU') : Text(''),
-                  (this.party.winners.contains(player.id)) ? Text('#1') : Text(''),
-                  Text('${player.point}'),
+                  Text(
+                    player.name,
+                    style: TextStyle(
+                      fontWeight: (this.playerID == player.id) ? FontWeight.bold : FontWeight.normal,
+                    ),
+                  ),
+                  Text(' - ${player.token} token(s) '),
+                  Text('  (${player.point})'),
                 ],
               ),
             ),
@@ -119,10 +122,7 @@ class Charge extends StatelessWidget {
         (this.party.winners.length != 0) ? Column(children: list) : Text(''),
         FlatButton(
           child: Text('Continue'),
-          onPressed: () {
-            this.party.nbRound = 2;
-            game.send('action_party', json.encode(this.party));
-          },
+          onPressed: _endCharge,
         )
       ],
     );
@@ -184,5 +184,26 @@ class Charge extends StatelessWidget {
     game.send('action_party', json.encode(this.party));
   }
 
-}
+  _endCharge() {
+    // Set to 'decharge'
+    this.party.nbRound = 2;
+    this.party.rolled = 0;
 
+    // Search the big looser
+    int playIndex = this.party.playIndex;
+    this.party.players.asMap().forEach((index, player) {
+      if (player.token > this.party.players[playIndex].token) {
+        playIndex = index;
+      }
+    });
+
+    this.party.playIndex = playIndex;
+    this.party.firstIndex = playIndex;
+    this.party.lastIndex = playIndex;
+    this.party.firstPlayerIndex = playIndex;
+
+    // Notify server
+    game.send('action_party', json.encode(this.party));
+  }
+
+}

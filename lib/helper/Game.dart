@@ -8,6 +8,7 @@
 import 'dart:math';
 
 import 'package:quatre_cent_vingt_et_un/model/Party.dart';
+import 'package:quatre_cent_vingt_et_un/model/Player.dart';
 
 /// Roll [nb] dices
 List<int> rollDices(int nb) {
@@ -21,6 +22,77 @@ List<int> rollDices(int nb) {
 
   return results;
 }
+
+
+Player rollUncharge(Player player) {
+  // temp value
+  bool temp1 = player.lock1;
+  bool temp2 = player.lock2;
+  bool temp3 = player.lock3;
+  // roll
+  Random random = new Random();
+  int a = (player.lock1) ? player.dice1 : random.nextInt(6) + 1;
+  int b = (player.lock2) ? player.dice2 : random.nextInt(6) + 1;
+  int c = (player.lock3) ? player.dice3 : random.nextInt(6) + 1;
+  // sort
+  List<int> results = sortDesc([a,b,c]);
+  // change locks
+  player.lock1 = false;
+  player.lock2 = false;
+  player.lock3 = false;
+  if (temp1) {
+    int position = results.indexWhere((element) => player.dice1 == element);
+    switch (position) {
+      case 0:
+        player.lock1 = temp1;
+        break;
+      case 1:
+        player.lock2 = temp1;
+        break;
+      case 2:
+        player.lock3 = temp1;
+        break;
+    }
+  }
+  if (temp2) {
+    int position = results.indexWhere((element) => player.dice2 == element);
+    switch (position) {
+      case 0:
+        player.lock1 = temp2;
+        break;
+      case 1:
+        player.lock2 = temp2;
+        break;
+      case 2:
+        player.lock3 = temp2;
+        break;
+    }
+  }
+  if (temp3) {
+    int position = results.indexWhere((element) => player.dice3 == element);
+    switch (position) {
+      case 0:
+        player.lock1 = temp3;
+        break;
+      case 1:
+        player.lock2 = temp3;
+        break;
+      case 2:
+        player.lock3 = temp3;
+        break;
+    }
+  }
+
+  // set result
+  player.dice1 = results[0];
+  player.dice2 = results[1];
+  player.dice3 = results[2];
+
+  player.point = getPoint(results);
+
+  return player;
+}
+
 
 /// Sort desc
 List<int> sortDesc(List<int> arr) {
@@ -100,7 +172,8 @@ Party setRanking(Party party) {
         }
 
       }
-    } else {
+    }
+    if (player.token == 0) {
       party.winners.add(player.id);
     }
   });
