@@ -7,7 +7,10 @@
 
 import 'dart:convert';
 
+import 'package:barcode_scan/platform_wrapper.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:quatre_cent_vingt_et_un/helper/Game.dart';
 import 'package:quatre_cent_vingt_et_un/helper/GameCommunication.dart';
 import 'package:quatre_cent_vingt_et_un/model/Party.dart';
@@ -244,6 +247,12 @@ class _StartPageState extends State<StartPage> {
       ));
     }
 
+    list.add(QrImage(
+      data: _party.id,
+      version: QrVersions.auto,
+      size: MediaQuery.of(context).size.width * 0.7,
+    ),);
+
     return Container(
       padding: EdgeInsets.all(10.0),
       child: Column(children: list),
@@ -288,10 +297,37 @@ class _StartPageState extends State<StartPage> {
               },
             )
           ],
+        ),
+        RaisedButton(
+          child: Text('Scan'),
+          onPressed: _scan,
         )
       ],
     );
   }
+
+
+  // Launch the camera
+  Future _scan() async {
+    try {
+      String barcode = (await BarcodeScanner.scan()).rawContent;
+      game.send('join_party', barcode);
+      /// Force a rebuild
+      setState(() {});
+    } on PlatformException catch(e) {
+      if (e.code == BarcodeScanner.cameraAccessDenied) {
+        print('The user did not grant the camera persmission');
+      } else {
+        print('Error... : $e');
+      }
+    } on FormatException {
+      print('Error...');
+    } catch(e) {
+      print('Error... : $e');
+    }
+  }
+
+
 
 
   @override

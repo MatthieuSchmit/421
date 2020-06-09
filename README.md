@@ -3,7 +3,7 @@
 421 game
 
 ## TODO
-- Begin : QRCode to join
+- ✅ Begin : QRCode to join
 - 221 (nenette)
 - ✅ 0 token discharge => Winner
 - End party
