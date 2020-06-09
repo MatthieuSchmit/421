@@ -8,13 +8,16 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:quatre_cent_vingt_et_un/helper/Game.dart';
 import 'package:quatre_cent_vingt_et_un/helper/GameCommunication.dart';
 import 'package:quatre_cent_vingt_et_un/model/Party.dart';
 import 'package:quatre_cent_vingt_et_un/model/Player.dart';
 import 'package:quatre_cent_vingt_et_un/screen/game/Charge.dart';
 import 'package:quatre_cent_vingt_et_un/screen/rule/Rules.dart';
+import 'package:quatre_cent_vingt_et_un/screen/widget/Dice.dart';
 
 import 'game/Uncharge.dart';
+import 'widget/ColorLabel.dart';
 
 class StartPage extends StatefulWidget {
   @override
@@ -45,26 +48,33 @@ class _StartPageState extends State<StartPage> {
   _onGameDataReceived(message) {
     switch (message["action"]) {
 
+      //
       case "party_info":
-        print(message['data']);
+        //print(message['data']);
         if (_party == null) {
           _party = new Party.fromJson(message["data"]);
         }
         List<dynamic> players = message['data']['players'];
-        _party.players = [];
         players.forEach((element) {
-          _party.players.add(new Player.fromJson(element));
+          Player player = new Player.fromJson(element);
+          if (_party.players.indexWhere((e) => e.id == player.id) == -1) {
+            _party.players.add(player);
+          }
         });
+        if (_party.host == playerID) {
+          game.send('action_party', json.encode(_party));
+        }
         setState(() {});
         break;
 
+      // Launch party
       case 'party_play':
         _party.open = false;
         setState(() {});
         break;
 
 
-
+      // Update _party after each player's action
       case 'party_action':
 
         Map<String,dynamic> data = json.decode(message['data']);
@@ -98,9 +108,15 @@ class _StartPageState extends State<StartPage> {
 
         break;
 
+      // The player just join
       case 'joined':
         print(message['data']);
         playerID = message['data']['id'];
+        break;
+
+      case 'eject':
+        _party = null;
+        setState(() {});
         break;
     }
   }
@@ -164,18 +180,53 @@ class _StartPageState extends State<StartPage> {
       ),
     ));
 
-    _party.players.forEach((player) {
-      list.add(ListTile(
-        leading: (_party.host == player.id) ? Text('Host') : Text(''),
-        title: Text(player.name),
-        trailing: (_party.host == playerID) ? RaisedButton(
-          onPressed: (){
-            game.send('eject', player.id);
-          },
-          child: Text('Eject'),
-        ) : Text(''),
+    int index = 0;
+    _party.players.asMap().forEach((key,player) {
+      if (player.id == playerID) index = key;
+      list.add(Row(
+        children: <Widget>[
+          Expanded(
+            child: Row(
+              children: <Widget>[
+                (_party.host == player.id) ? ColorLabel(text: 'Host',color: Colors.yellow) : Text(''),
+                SizedBox(width: 10.0),
+                Text(
+                  player.name,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold
+                  ),
+                ),
+                /*
+                (playerID == player.id || playerID == _party.host) ? FlatButton(
+                  child: Text('Eject'),
+                  onPressed: () {
+                    game.send('eject', json.encode(player.id));
+                  },
+                ) : Text(''),
+                */
+              ],
+            ),
+          ),
+          Dice(dice: player.dice1, width: MediaQuery.of(context).size.width/8),
+        ],
       ));
     });
+
+
+    if (_party.players[index].dice1 == 0) {
+      list.add(ListTile(
+        title: Center(
+          child: Text('Roll'),
+        ),
+        onTap: () {
+          _party.players[index].dice1 = rollDices(1)[0];
+          _party.players.sort((b,a) => a.dice1.compareTo(b.dice1));
+          game.send('action_party', json.encode(_party));
+        },
+      ));
+    }
+
+
 
     if (_party.host == playerID) {
       list.add(ListTile(
@@ -183,13 +234,19 @@ class _StartPageState extends State<StartPage> {
           child: Text('Play'),
         ),
         onTap: () {
+
+          _party.players.forEach((element) {
+            element.dice1 = 0;
+          });
+
           game.send('play_party', _party.id);
         },
       ));
     }
 
-    return new Column(
-      children: list,
+    return Container(
+      padding: EdgeInsets.all(10.0),
+      child: Column(children: list),
     );
   }
 

@@ -3,13 +3,15 @@
 421 game
 
 ## TODO
+- Begin : QRCode to join
 - 221 (nenette)
-- 0 token discharge => Winner
+- ✅ 0 token discharge => Winner
 - End party
 - Eject player (before play)
-- Roll dice to get play order
+- ✅ Roll dice to get play order
 - Discharge : force nb roll
-- Discharge : 421 => all token 
+- ✅ Discharge : 421 => all token
+- Discharge : timer
 
 ## Getting Started
 

@@ -23,7 +23,7 @@ List<int> rollDices(int nb) {
   return results;
 }
 
-
+/// Roll unlocked dices
 Player rollUncharge(Player player) {
   // temp value
   bool temp1 = player.lock1;
@@ -93,7 +93,6 @@ Player rollUncharge(Player player) {
   return player;
 }
 
-
 /// Sort desc
 List<int> sortDesc(List<int> arr) {
   arr.sort((b, a) => a.compareTo(b));
@@ -108,6 +107,42 @@ List<int> sortAsc(List<int> arr) {
 
 /// Get points
 int getPoint(List<int> dices) {
+
+  // 421
+  if (dices.contains(4) && dices.contains(2) && dices.contains(1)) return 10;
+  // 111
+  if ((dices.where((e) => e == 1)).length == 3) return 7;
+  // 11x
+  if ((dices.where((e) => e == 1)).length == 2) {
+    if (dices.contains(6)) return 6; // 116
+    if (dices.contains(5)) return 5; // 115
+    if (dices.contains(4)) return 4; // 114
+    if (dices.contains(3)) return 3; // 113
+    if (dices.contains(2)) return 2; // 112
+  }
+  // 666
+  if ((dices.where((e) => e == 6)).length == 3) return 6;
+  // 555
+  if ((dices.where((e) => e == 5)).length == 3) return 5;
+  // 444
+  if ((dices.where((e) => e == 4)).length == 3) return 4;
+  // 333
+  if ((dices.where((e) => e == 3)).length == 3) return 3;
+  // 222
+  if ((dices.where((e) => e == 2)).length == 3) return 2;
+  // 123
+  if (dices.contains(1) && dices.contains(2) && dices.contains(3)) return 2;
+  // 234
+  if (dices.contains(4) && dices.contains(2) && dices.contains(3)) return 2;
+  // 345
+  if (dices.contains(5) && dices.contains(4) && dices.contains(3)) return 2;
+  // 456
+  if (dices.contains(4) && dices.contains(5) && dices.contains(6)) return 2;
+
+  // Rest
+  return 1;
+
+  /*
   int total = dices[0] * 100 + dices[1] * 10 + dices[2];
 
   switch (total) {
@@ -145,11 +180,93 @@ int getPoint(List<int> dices) {
       return 1;
       break;
   }
+  */
 
+}
+
+/// Get ranking
+int getRanking(List<int> dices) {
+  // 421
+  if (dices.contains(4) && dices.contains(2) && dices.contains(1)) return 1;
+  // 111
+  if ((dices.where((e) => e == 1)).length == 3) return 2;
+  // 11x
+  if ((dices.where((e) => e == 1)).length == 2) {
+    if (dices.contains(6)) return 3; // 116
+    if (dices.contains(5)) return 5; // 115
+    if (dices.contains(4)) return 7; // 114
+    if (dices.contains(3)) return 9; // 113
+    if (dices.contains(2)) return 11; // 112
+  }
+  // 666
+  if ((dices.where((e) => e == 6)).length == 3) return 4;
+  // 555
+  if ((dices.where((e) => e == 5)).length == 3) return 6;
+  // 444
+  if ((dices.where((e) => e == 4)).length == 3) return 8;
+  // 333
+  if ((dices.where((e) => e == 3)).length == 3) return 10;
+  // 222
+  if ((dices.where((e) => e == 2)).length == 3) return 12;
+  // 123
+  if (dices.contains(1) && dices.contains(2) && dices.contains(3)) return 16;
+  // 234
+  if (dices.contains(4) && dices.contains(2) && dices.contains(3)) return 15;
+  // 345
+  if (dices.contains(5) && dices.contains(4) && dices.contains(3)) return 14;
+  // 456
+  if (dices.contains(4) && dices.contains(5) && dices.contains(6)) return 13;
+
+  // Rest
+  return 17;
 }
 
 /// Set winner and looser
 Party setRanking(Party party) {
+  party.players.asMap().forEach((key, player) {
+    if (player.point != 0) {
+      int rankingPlayer = getRanking([player.dice1, player.dice2, player.dice3]);
+      int rankingFirst = getRanking([party.players[party.firstIndex].dice1, party.players[party.firstIndex].dice2, party.players[party.firstIndex].dice3]);
+      int rankingLast = getRanking([party.players[party.lastIndex].dice1, party.players[party.lastIndex].dice2, party.players[party.lastIndex].dice3]);
+
+      // Testing first
+      if (rankingPlayer == 17 && rankingFirst == 17) {
+        // test combination
+        List<int> sortPlayer = sortDesc([player.dice1, player.dice2, player.dice3]);
+        List<int> sortFirst = sortDesc([party.players[party.firstIndex].dice1, party.players[party.firstIndex].dice2, party.players[party.firstIndex].dice3]);
+        int totalPlayer = sortPlayer[0]*100 + sortPlayer[1]*10 + sortPlayer[2];
+        int totalFirst = sortFirst[0]*100 + sortFirst[1]*10 + sortFirst[2];
+        if (totalPlayer > totalFirst) {
+          party.firstIndex = key;
+        }
+      } else if (rankingPlayer < rankingFirst) {
+        // player first
+        party.firstIndex = key;
+      }
+
+      // Testing last
+      if (rankingPlayer == 17 && rankingLast == 17) {
+        // test combination
+        List<int> sortPlayer = sortDesc([player.dice1, player.dice2, player.dice3]);
+        List<int> sortLast = sortDesc([party.players[party.lastIndex].dice1, party.players[party.lastIndex].dice2, party.players[party.lastIndex].dice3]);
+        int totalPlayer = sortPlayer[0]*100 + sortPlayer[1]*10 + sortPlayer[2];
+        int totalLast = sortLast[0]*100 + sortLast[1]*10 + sortLast[2];
+        if (totalPlayer < totalLast) {
+          party.lastIndex = key;
+        }
+      } else if (rankingPlayer > rankingLast) {
+        // player last
+        party.lastIndex = key;
+      }
+    }
+  });
+
+  return party;
+}
+
+
+/// Set winner and looser
+Party setRanking_(Party party) {
   party.winners = [];
   party.players.asMap().forEach((key, player) {
     if (player.point != 0) {

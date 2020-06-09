@@ -189,11 +189,14 @@ class Charge extends StatelessWidget {
     this.party.nbRound = 2;
     this.party.rolled = 0;
 
-    // Search the big looser
+    // Search the big looser and winner(s)
     int playIndex = this.party.playIndex;
     this.party.players.asMap().forEach((index, player) {
       if (player.token > this.party.players[playIndex].token) {
         playIndex = index;
+      }
+      if (player.token == 0) {
+        this.party.winners.add(player.id);
       }
     });
 

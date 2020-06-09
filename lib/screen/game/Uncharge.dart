@@ -51,8 +51,9 @@ class Uncharge extends StatelessWidget {
                     ),
                   ),
                   Text(' - ${player.token} token(s) '),
-                  (this.party.winners.contains(player.id)) ? Text(' #1') : Text(''),
-                  Text('${player.point}'),
+                  //(this.party.winners.contains(player.id)) ? Text(' #1') : Text(''),
+                  _rankingView(player.id),
+                  //Text('${player.point}'),
                 ],
               ),
             ),
@@ -91,6 +92,16 @@ class Uncharge extends StatelessWidget {
     });
 
     return Column(children: list);
+  }
+
+  Widget _rankingView(String id) {
+    if (this.party.winners.contains(id)) {
+      return Text(' #1 ');
+    } else if (this.party.ranking.contains(id)) {
+      return Text(' #${this.party.ranking.indexOf(id)+2}');
+    } else {
+      return Text('');
+    }
   }
 
   Widget _viewGame(BuildContext context) {
@@ -228,6 +239,13 @@ class Uncharge extends StatelessWidget {
     if (nextIndex == this.party.players.length) {
       nextIndex = 0;
     }
+    // test if have tokens
+    while(this.party.players[nextIndex].token == 0) {
+      int nextIndex = this.party.playIndex + 1;
+      if (nextIndex == this.party.players.length) {
+        nextIndex = 0;
+      }
+    }
     this.party.playIndex = nextIndex;
     this.party = setRanking(this.party);
 
@@ -237,11 +255,24 @@ class Uncharge extends StatelessWidget {
   _endRound() {
     // set tokens
     int tokenToTake = this.party.players[this.party.firstIndex].point;
-    if (tokenToTake > this.party.players[this.party.firstIndex].token) {
+    if (tokenToTake > this.party.players[this.party.firstIndex].token || tokenToTake == 10) {
       tokenToTake = this.party.players[this.party.firstIndex].token;
     }
     this.party.players[this.party.firstIndex].token = this.party.players[this.party.firstIndex].token - tokenToTake;
     this.party.players[this.party.lastIndex].token = this.party.players[this.party.lastIndex].token + tokenToTake;
+
+    // Some winner
+    if (this.party.players[this.party.firstIndex].token == 0) {
+      if (this.party.winners.length == 0) {
+        this.party.winners.add(this.party.players[this.party.firstIndex].id);
+      } else {
+        this.party.ranking.add(this.party.players[this.party.firstIndex].id);
+      }
+    }
+    // Big looser !!
+    if (this.party.players[this.party.lastIndex].token == 21) {
+      this.party.token = 21; // ending game
+    }
 
     // reset dices
     this.party.players.forEach((player) {
@@ -252,6 +283,7 @@ class Uncharge extends StatelessWidget {
       player.lock1 = false;
       player.lock2 = false;
       player.lock3 = false;
+      player.point = 0;
     });
     this.party.rolled = 0;
     this.party.maxRolled = 3;
